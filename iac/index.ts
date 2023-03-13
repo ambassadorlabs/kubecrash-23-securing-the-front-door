@@ -8,3 +8,7 @@ emissary.release
 certmanager.release
 emojivoto.install
 emojivoto.stagingCertificate
+//emojivoto.dns
+//emojivoto.host
+//emojivoto.mapping
+//emojivoto.productionCertificate
