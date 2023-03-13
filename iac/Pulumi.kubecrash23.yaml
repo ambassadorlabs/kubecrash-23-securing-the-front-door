@@ -1,1 +1,8 @@
 encryptionsalt: v1:Ah64iqMOnjc=:v1:vOj8n8Jczv62PF5u:MRe/5veFktfUNsiD9t+g5Quxyyr2pQ==
+config:
+  cloudflare:apiToken:
+    secure: v1:nhhET8V8xC65gK8j:UACOUGWPoDbT45wGKoJk3W2Wg2/kPFUvSeAoR6w1HmZgQdcM49Ucz+NWMRNXOj//Yu+QjvHBV7I=
+  kubecrash-23:acmeEmail:
+    secure: v1:1BYLceDfKThX/dK2:ult02cMjU2/kAqp8EKUxSGby4sPX4taQ2wbBwNwBvL65xQ==
+  kubecrash-23:cloudflareZoneId:
+    secure: v1:xI4UepJjk24YumZM:lytox770JAs2NGEsARULEKiO9q4YXJovG34+e/GlLBFTeJ3c/2pblud3jrfQ5MY/
