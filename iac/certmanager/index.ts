@@ -1,5 +1,5 @@
 import * as k8s from '@pulumi/kubernetes'
-import * as certmanager from '../crds/certmanager'
+import * as certmanager from '../crds/certmanager/index'
 import * as cluster from '../cluster'
 import config from '../config'
 
@@ -51,7 +51,7 @@ export const stagingClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer
             cloudflare: {
               apiTokenSecretRef: {
                 name: cloudflareSecret.metadata.name,
-                key: 'apiKey'
+                key: 'api-token'
               }
             }
           }
@@ -79,7 +79,7 @@ export const stagingClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer
              cloudflare: {
                apiTokenSecretRef: {
                  name: cloudflareSecret.metadata.name,
-                 key: 'apiKey'
+                 key: 'api-token'
                }
              }
            }

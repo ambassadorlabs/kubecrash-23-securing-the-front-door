@@ -7,3 +7,4 @@ cluster.provider
 emissary.release
 certmanager.release
 emojivoto.install
+emojivoto.stagingCertificate
