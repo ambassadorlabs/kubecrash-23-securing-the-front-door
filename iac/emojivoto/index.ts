@@ -6,8 +6,7 @@ import * as certmanagerCRDs from '../crds/certmanager/certmanager/index'
 import config from '../config'
 import * as certmanager from '../certmanager'
 import * as emissary from '../emissary'
-
-const namespace = 'emojivoto'
+import {emojivoto, domain, tld } from '../consts'
 
 export const install = new k8s.kustomize.Directory('emojivoto', {
   directory: 'https://github.com/BuoyantIO/emojivoto/tree/main/kustomize/deployment'
@@ -17,14 +16,14 @@ export const install = new k8s.kustomize.Directory('emojivoto', {
 // go through the rate limit on the production server
 export const stagingCertificate = new certmanagerCRDs.v1.Certificate('emojivoto-certificate-staging', {
   metadata: {
-    name: `emojivoto`,
-    namespace: namespace,
+    name: `${emojivoto}-staging`,
+    namespace: emojivoto,
   },
   spec: {
-    secretName: `emojivoto-developnik-com-staging`,
+    secretName: `${emojivoto}-${domain}-${tld}-staging`,
     duration: '2160h',
     renewBefore: '360h',
-    dnsNames: ['emojivoto.thedevelopnik.com'],
+    dnsNames: [`${emojivoto}.${domain}.${tld}`],
     issuerRef: {
       name: 'letsencrypt-staging',
       kind: 'ClusterIssuer',
@@ -34,14 +33,14 @@ export const stagingCertificate = new certmanagerCRDs.v1.Certificate('emojivoto-
 
 //export const productionCertificate = new certmanagerCRDs.v1.Certificate('emojivoto-certificate-production', {
 //  metadata: {
-//    name: `emojivoto`,
-//    namespace: namespace,
+//    name: `${emojivoto}-staging`,
+//    namespace: emojivoto,
 //  },
 //  spec: {
-//    secretName: `emojivoto-thedevelopnik-com`,
+//    secretName: `${emojivoto}-${domain}-${tld}-staging`,
 //    duration: '2160h',
 //    renewBefore: '360h',
-//    dnsNames: ['emojivoto.thedevelopnik.com'],
+//    dnsNames: [`${emojivoto}.${domain}.${tld}`],
 //    issuerRef: {
 //      name: 'letsencrypt-production',
 //      kind: 'ClusterIssuer',
@@ -62,18 +61,27 @@ export const stagingCertificate = new certmanagerCRDs.v1.Certificate('emojivoto-
 //    namespace: namespace,
 //  },
 //  spec: {
-//    hostname: 'emojivoto.thedevelopnik.com',
-//    tlsSecret: {
-//      name: 'emojivoto-thedevelopnik-com'
-//    },
+//    hostname: `${emojivoto}.${domain}.${tld}`,
 //    requestPolicy: {
 //      insecure: {
 //        action: 'Route',
-//        action: 'Redirect',
 //      }
 //    }
 //  }
 //}, { provider: cluster.provider, dependsOn: [emissary.release, dns ] })
+
+// secure host spec config
+//  spec: {
+//    hostname: `${emojivoto}.${domain}.${tld}`,
+//    tlsSecret: {
+//      name: `${emojivoto}-${domain}-${tld}`
+//    },
+//    requestPolicy: {
+//      insecure: {
+//        action: 'Redirect',
+//      }
+//    }
+//  }
 
 //export const mapping = new emissaryCRDs.v3alpha1.Mapping('emojivoto-mapping', {
 //  metadata: {
@@ -81,7 +89,7 @@ export const stagingCertificate = new certmanagerCRDs.v1.Certificate('emojivoto-
 //    namespace: namespace,
 //  },
 //  spec: {
-//    host: 'emojivoto.thedevelopnik.com',
+//    host: `${emojivoto}.${domain}.${tld}`,
 //    prefix: '/',
 //    service: 'web-svc.emojivoto:80'
 //  }
