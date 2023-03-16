@@ -34,11 +34,11 @@ cert-manager provides many different [DNS resolver options](https://cert-manager
 1. See if your DNS services is available as an option from cert-manager
 2. Look in the [Pulumi docs](https://www.pulumi.com/registry/) for the provider for your service, like [Route53](https://www.pulumi.com/registry/packages/aws/api-docs/route53/) or [DigitalOcean](https://www.pulumi.com/registry/packages/digitalocean/)
 3. For whatever secret key is required for your provider, follow the doc instructions to set it, i.e. `$ pulumi config set --secret digitalocean:token '<yourtoken>'`
-4. In the [emojivoto config file](./iac/emojivoto/index.ts) replace the exported `dns` const with the correct code for your provider.
+4. In the [faces config file](./iac/faces/index.ts) replace the exported `dns` const with the correct code for your provider.
 5. In the [cert-manager config file](./iac/certmanager/index.ts) replace the solver in the `stagingClusterIssuer` and `productionClusterIssuer` with your solver configuration.
 
 #### Customize your domain
-In the [consts file](./iac/consts.ts) change the `domain` and `tld` variables to change the interpolated text in other places from `emojivoto.thedevelopnik.com` to your domain.
+In the [consts file](./iac/consts.ts) change the `domain` and `tld` variables to change the interpolated text in other places from `faces.thedevelopnik.com` to your domain.
 
 #### Point to your Kubernetes cluster configuration
 In the [cluster configuration file](./iac/cluster/index.ts) change the properties to point to your `.kube/config` file or appropriate standalone config file to point at your test cluster.
@@ -49,10 +49,10 @@ Now cd into the `iac/` directory and run `$ pulumi up`. You will get a question 
 The first run will initiate a lot of changes, as it will install
 * Emissary-Ingress
 * cert-manager
-* [Emojivoto sample application](https://github.com/BuoyantIO/emojivoto)
+* [Faces sample application](https://github.com/BuoyantIO/faces-demo)
 * Create a TLS certificate using Let's Encrypt's staging server.
 
-Next, double check that your certificate configuration is correct by running `$ kubectl get certificate -n emojivoto emojivoto-staging`. It can take up to 90 seconds or so
+Next, double check that your certificate configuration is correct by running `$ kubectl get certificate -n faces faces-staging`. It can take up to 90 seconds or so
 for the certificate to finish procurement. If it does not, or if there is an error, you can check the logs of the cert-manager pod in the cert-manager namespace for more information.
 
 **It is absolutely critical that you attempt to get a staging certificate before doing a production one, as it's easy to burn through
@@ -60,7 +60,7 @@ the Let's Encrypt production server rate limit and be unable to continue.**
 
 ### Securely routing traffic with Emissary-Ingress
 
-The rest of our work will be in the [emojivoto file](./iac/emojivoto/index.ts) and all commands will be run in the `iac/` directory.
+The rest of our work will be in the [faces file](./iac/faces/index.ts) and all commands will be run in the `iac/` directory.
 
 #### DNS
 Uncomment the `dns` code block, run `$ pulumi up` and confirm the prompt to create a DNS entry pointing at your cluster.
@@ -70,7 +70,7 @@ Uncomment the `host` code block, run `$ pulumi up` and confirm the prompt to cre
 Hosts tell Emissary-Ingress what domains to accept traffic from, and how to handle requests coming from that domain.
 Note that in the `requestPolicy` block, we tell it to `Route` insecure requests. We don't have a certificate set up yet, but we want to check connectivity.
 
-Emissary-Ingress is now listening on that domain, but if you go to your emojivoto DNS entry (http://emojivoto.yourdomain.tld) you won't reach emojivoto, because
+Emissary-Ingress is now listening on that domain, but if you go to your faces DNS entry (http://faces.yourdomain.tld) you won't reach faces, because
 we haven't configured Emissary to route traffic yet.
 
 #### Mapping
@@ -81,12 +81,12 @@ Mappings are the core of Emissary-Ingress' decentralized workflow. A platform te
 for example as part of a Helm chart, and instantly create or update routes as they need without waiting on the platform/ops team.
 
 #### Testing the connection and making it secure
-Now that we have a DNS entry, a Host and a Mapping, you can open a browser and visit http://emojivoto.yourdomain.tld and see the app running and accessible.
+Now that we have a DNS entry, a Host and a Mapping, you can open a browser and visit http://faces.yourdomain.tld and see the app running and accessible.
 
 But we don't want an insecure connection, the whole point is to secure our cluster at the edge! To fix this, we need to create a certificate using cert-manager, and tell Emissary to use it.
 
 First, uncomment the `productionCertificate` code block, run `$ pulumi up` and confirm the prompt. Now just as you did before with the staging certificate, check that it successfully provisions.
-The resulting certificate info is stored in a Kubernetes secret following the pattern `${emojivoto}-${domain}-${tld}`.
+The resulting certificate info is stored in a Kubernetes secret following the pattern `${faces}-${domain}-${tld}`.
 
 Now that we have a certificate, we want to update our Host. Copy the commented-out `secure host spec config` code block from below the Host config, and paste it into the Host,
 replacing the current `spec`. There are two major changes here.
@@ -94,4 +94,14 @@ replacing the current `spec`. There are two major changes here.
 2. We change our `requestPolicy` property to `Redirect` all insecure requests instead of routing them forward. Now no insecure requests can come into our cluster.
 
 With Emissary as the only entrypoint, any traffic not controlled by a Host being rejected, and the Host redirecting all insecure requests, our cluster is secured at the edge!
-The platform/ops team has now created a secure ingress that devs don't need to worry about, and they can create/update traffic routing without breaking the secure setup. 
+The platform/ops team has now created a secure ingress that devs don't need to worry about, and they can create/update traffic routing without breaking the secure setup.
+
+### Basic Auth
+Finally we want to protect our cluster by authenticating our end users. For this demo we'll use basic auth to keep the process as simple as possible.
+
+I've modified the basic auth service from [Emissary's demo of basic auth](https://www.getambassador.io/docs/emissary/latest/howtos/basic-auth) that will require authentication
+for all requests. To install it, uncomment the `exampleAuth` code block at the bottom of the [emissary config file](./iac/emissary/index.ts), and import
+the const into the [main index file](./iac/index.ts). Run `$ pulumi up` and confirm the prompt, and the basic auth service will get installed to the cluster.
+
+Now refresh the faces app in your browser, and you will be prompted for a username and password, which are `username` and `password` respectively
+(Yes. I know. This is a demo. Don't do that in prod). With credentials provided, you can now access the Faces app again!

@@ -27,3 +27,7 @@ export const release = new k8s.helm.v3.Release('emissary-ingress', {
 
 const svc = k8s.core.v1.Service.get('emissary-ingress-svc', pulumi.interpolate`${namespace.metadata.name}/${release.status.name}`)
 export const externalIP = svc.status.loadBalancer.ingress[0].ip
+
+//export const exampleAuth = new k8s.yaml.ConfigFile('example-auth', {
+//  file: './emissary/example-auth.yaml'
+//}, { provider: cluster.provider, dependsOn: [crds, release] })

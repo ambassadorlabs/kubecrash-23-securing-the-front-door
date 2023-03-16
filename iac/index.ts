@@ -1,14 +1,17 @@
 import * as cluster from './cluster'
 import * as emissary from './emissary'
 import * as certmanager from './certmanager'
-import * as emojivoto from './emojivoto'
+import * as faces from './faces'
 
 cluster.provider
 emissary.release
 certmanager.release
-emojivoto.install
-emojivoto.stagingCertificate
-//emojivoto.dns
-//emojivoto.host
-//emojivoto.mapping
-//emojivoto.productionCertificate
+faces.configFile
+faces.stagingCertificate
+//faces.dns
+//faces.host
+//faces.guiMapping
+//faces.colorMapping
+//faces.faceMapping
+//faces.smileyMapping
+//faces.productionCertificate
