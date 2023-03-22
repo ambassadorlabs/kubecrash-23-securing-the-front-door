@@ -6,12 +6,14 @@ import * as faces from './faces'
 cluster.provider
 emissary.release
 certmanager.release
+certmanager.stagingHttpClusterIssuer
+certmanager.productionHttpClusterIssuer
 faces.configFile
-faces.stagingCertificate
 //faces.dns
 //faces.host
+//faces.acmeService
+//faces.acmeMapping
+//faces.stagingCertificate
 //faces.guiMapping
-//faces.colorMapping
 //faces.faceMapping
-//faces.smileyMapping
 //faces.productionCertificate

@@ -1,5 +1,6 @@
 import * as k8s from '@pulumi/kubernetes'
 import * as certmanager from '../crds/certmanager/index'
+import * as emissaryCRDs from '../crds/emissary/getambassador/index'
 import * as cluster from '../cluster'
 import config from '../config'
 
@@ -33,9 +34,9 @@ const cloudflareSecret = new k8s.core.v1.Secret('cert-manager-cloudflare', {
   }
 }, { provider: cluster.provider })
 
-export const stagingClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer('staging-cluster-issuer', {
+export const stagingHttpClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer('staging-http-cluster-issuer', {
   metadata: {
-    name: 'letsencrypt-staging',
+    name: 'letsencrypt-http-staging',
     namespace: namespace.metadata.name
   },
   spec: {
@@ -43,16 +44,13 @@ export const stagingClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer
       email: config.requireSecret('acmeEmail'),
       server: 'https://acme-staging-v02.api.letsencrypt.org/directory',
       privateKeySecretRef: {
-        name: 'staging-issuer-account-key'
+        name: 'staging-http-issuer-account-key'
       },
       solvers: [
         {
-          dns01: {
-            cloudflare: {
-              apiTokenSecretRef: {
-                name: cloudflareSecret.metadata.name,
-                key: 'api-token'
-              }
+          http01: {
+            ingress: {
+              class: 'nginx'
             }
           }
         }
@@ -61,9 +59,9 @@ export const stagingClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer
   }
 }, {provider: cluster.provider, dependsOn: release })
 
- export const productionClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer('production-cluster-issuer', {
+ export const productionHttpClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer('production-http-cluster-issuer', {
    metadata: {
-     name: 'letsencrypt-production',
+     name: 'letsencrypt-http-production',
      namespace: namespace.metadata.name
    },
    spec: {
@@ -71,16 +69,13 @@ export const stagingClusterIssuer = new certmanager.certmanager.v1.ClusterIssuer
        email: config.requireSecret('acmeEmail'),
        server: 'https://acme-v02.api.letsencrypt.org/directory',
        privateKeySecretRef: {
-         name: 'production-issuer-account-key'
+         name: 'production-http-issuer-account-key'
        },
        solvers: [
          {
-           dns01: {
-             cloudflare: {
-               apiTokenSecretRef: {
-                 name: cloudflareSecret.metadata.name,
-                 key: 'api-token'
-               }
+           http01: {
+             ingress: {
+               class: 'nginx'
              }
            }
          }
