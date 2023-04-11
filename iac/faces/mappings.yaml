@@ -26,3 +26,7 @@ spec:
   rewrite: '/'
   service: 'face.faces:80'
   timeout_ms: 2000
+  retry_policy:
+    retry_on: retriable-4xx
+    num_retries: 5
+    per_try_timeout: 2s
