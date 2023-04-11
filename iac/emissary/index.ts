@@ -2,7 +2,7 @@ import * as pulumi from '@pulumi/pulumi'
 import * as k8s from '@pulumi/kubernetes'
 import * as cluster from '../cluster'
 
-const namespace = new k8s.core.v1.Namespace('ambassador', {
+export const namespace = new k8s.core.v1.Namespace('ambassador', {
   metadata: {
     name: 'ambassador',
   }
@@ -15,7 +15,7 @@ export const crds = new k8s.yaml.ConfigFile('emissary-ingress-3-crds', {
 
 export const release = new k8s.helm.v3.Release('emissary-ingress', {
   chart: 'emissary-ingress',
-  version: '8.5.1',
+  version: '8.5.2',
   namespace: namespace.metadata.name,
   repositoryOpts: {
     repo: 'https://app.getambassador.io'

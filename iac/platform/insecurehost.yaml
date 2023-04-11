@@ -1,0 +1,13 @@
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Host
+metadata:
+  labels:
+    app.kubernetes.io/managed-by: pulumi
+  name: faces
+  namespace: ambassador
+spec:
+  hostname: faces.thedevelopnik.com
+  requestPolicy:
+    insecure:
+      action: Route

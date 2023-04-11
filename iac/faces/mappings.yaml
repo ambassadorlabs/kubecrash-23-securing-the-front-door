@@ -1,0 +1,20 @@
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: faces-gui
+  namespace: faces
+spec:
+  host: faces.thedevelopnik.com
+  prefix: '/'
+  service: 'faces-gui.faces:80'
+---
+apiVersion: getambassador.io/v3alpha1
+kind: Mapping
+metadata:
+  name: faces-face
+  namespace: faces
+spec:
+  host: faces.thedevelopnik.com
+  prefix: '/face'
+  service: 'face.faces:80'
