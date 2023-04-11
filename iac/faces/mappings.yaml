@@ -8,6 +8,12 @@ spec:
   host: faces.thedevelopnik.com
   prefix: '/'
   service: 'faces-gui.faces:80'
+  cors:
+    origins:
+      - http://faces.thedevelopnik.com
+      - https://faces.thedevelopnik.com
+    methods:
+      - GET
 ---
 apiVersion: getambassador.io/v3alpha1
 kind: Mapping
@@ -17,4 +23,6 @@ metadata:
 spec:
   host: faces.thedevelopnik.com
   prefix: '/face'
+  rewrite: '/'
   service: 'face.faces:80'
+  timeout_ms: 2000
